@@ -1,0 +1,4 @@
+crewai
+crewai[tools,google-genai]
+python-dotenv
+google-generativeai
