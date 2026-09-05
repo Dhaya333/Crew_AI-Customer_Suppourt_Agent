@@ -2,3 +2,9 @@ crewai
 crewai[tools,google-genai]
 python-dotenv
 google-generativeai
+fastapi
+uvicorn
+streamlit
+requests
+gspread
+google-auth
