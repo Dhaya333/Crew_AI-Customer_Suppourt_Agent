@@ -1,40 +1,64 @@
 inquiry_resolution:
   description: >
-    {customer} just reached out with a super important ask:
-    {inquiry}
+    {name} has submitted a support request under the category:
+    "{category}".
 
-    {person} from {customer} is the one that reached out. Make sure
-    to use everything you know to provide the best support possible.
-    You must strive to provide a complete and accurate response to
-    the customer's inquiry.
+    Their message: {inquiry}
+
+    Use the category to guide how you approach this request:
+    - "Need support in code": {name} needs hands-on help with their
+      code. Read their message carefully, identify the root cause,
+      and provide a working solution with a clear explanation of why
+      it works.
+    - "Feedback": {name} is sharing feedback, not reporting a broken
+      experience. Acknowledge their input genuinely, avoid being
+      defensive, and note any specific points that would be useful
+      to pass along to the product team.
+    - "Report a Bug": {name} is reporting something that isn't
+      working as expected. Try to reproduce or reason through the
+      issue, confirm whether it's a known limitation or a genuine
+      bug, and give clear next steps or a workaround if one exists.
+    - "Installation": {name} needs help getting set up. Walk through
+      the setup process relevant to their message step by step,
+      calling out common mistakes at each stage.
+
+    Make sure to use everything you know to provide the best support
+    possible. You must strive to provide a complete and accurate
+    response to {name}'s request.
 
     Use the scraping tools available to you to check the relevant
     documentation pages. If those pages don't fully answer the
     question, use the search tool to find additional relevant
     information online.
   expected_output: >
-    A detailed, informative response to the customer's inquiry that
-    addresses all aspects of their question. The response should
-    include references to everything you used to find the answer,
-    including external data or solutions. Ensure the answer is
-    complete, leaving no questions unanswered, and maintain a helpful
-    and friendly tone throughout.
+    A detailed, informative response to {name}'s request that matches
+    the tone and depth appropriate for its category (a working fix
+    for code support, a genuine acknowledgment for feedback, clear
+    diagnosis and next steps for a bug report, or a clean step-by-step
+    walkthrough for installation help). The response should include
+    references to everything you used to find the answer, including
+    external data or solutions. Ensure the answer is complete, leaving
+    no questions unanswered, and maintain a helpful and friendly tone
+    throughout.
   agent: customer_support_agent
 
 quality_assurance_review:
   description: >
     Review the response drafted by the Senior Support Representative
-    for {customer}'s inquiry. Ensure that the answer is comprehensive,
-    accurate, and adheres to the high-quality standards expected for
-    customer support. Verify that all parts of the customer's inquiry
-    have been addressed thoroughly, with a helpful and friendly tone.
-    Check for references and sources used to find the information,
-    ensuring the response is well-supported and leaves no questions
-    unanswered.
+    for {name}'s "{category}" request. Ensure that the answer is
+    comprehensive, accurate, and adheres to the high-quality standards
+    expected for customer support. Verify that all parts of {name}'s
+    request have been addressed thoroughly, with a helpful and
+    friendly tone. Check for references and sources used to find the
+    information, ensuring the response is well-supported and leaves
+    no questions unanswered. Also confirm the response actually fits
+    its category — e.g. a "Report a Bug" reply should give a real
+    diagnosis, not just sympathy; an "Installation" reply should be
+    a clear walkthrough, not a vague pointer to docs.
   expected_output: >
     A final, detailed, and informative response ready to be sent to
-    the customer. This response should fully address the customer's
-    inquiry, incorporating all relevant feedback and improvements.
-    Don't be too formal, we are a chill and cool company but maintain
-    a professional and friendly tone throughout.
+    {name}. This response should fully address their request,
+    incorporating all relevant feedback and improvements. Don't be
+    too formal, we are a chill and cool company but maintain a
+    professional and friendly tone throughout.
   agent: quality_assurance_agent
