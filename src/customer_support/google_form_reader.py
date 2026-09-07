@@ -14,15 +14,15 @@ SERVICE_ACCOUNT_FILE = os.getenv("GOOGLE_SERVICE_ACCOUNT_FILE", "service_account
 # Map your Google Form's actual column headers (left) to the keys
 # CrewAI expects (right). Edit the left-hand strings to match your form.
 COLUMN_MAP = {
-    "Customer": "customer",
-    "Person": "person",
-    "Inquiry": "inquiry",
+    "Category": "category",
+    "Name": "name",
+    "Inquiry": "inquiry"
 }
  
 # The form's email question — edit the left-hand string to match your
 # form's actual column header (Google Forms' built-in email-collection
 # question is usually titled "Email Address").
-EMAIL_COLUMN = "Email Address"
+EMAIL_COLUMN = "Registered Email_ID"
  
  
 def get_latest_form_response() -> dict:
