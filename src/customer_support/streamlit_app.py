@@ -21,20 +21,20 @@ tab_manual, tab_form = st.tabs(["Ask manually", "Process latest Google Form resp
 
 with tab_manual:
     with st.form("support_form"):
-        customer = st.text_input("Customer / Company name", placeholder="Acme Inc.")
-        person = st.text_input("Your name", placeholder="Jane Doe")
+        category = st.text_input("Category", placeholder="e.g., Report a bug")
+        name = st.text_input("Your name", placeholder="Jane Doe")
         inquiry = st.text_area("What do you need help with?", height=150)
         submitted = st.form_submit_button("Submit")
 
     if submitted:
-        if not customer or not person or not inquiry:
-            st.error("Please fill in Customer, Your name, and the Inquiry field.")
+        if not category or not name or not inquiry:
+            st.error("Please fill in Category, Your name, and the Inquiry field.")
         else:
             with st.spinner("Agents are working on your request..."):
                 try:
                     resp = requests.post(
                         f"{API_BASE}/support-request",
-                        json={"customer": customer, "person": person, "inquiry": inquiry},
+                        json={"category": category, "name": name, "inquiry": inquiry},
                         timeout=300,
                     )
                     resp.raise_for_status()
