@@ -6,7 +6,7 @@ customer_support_agent:
     in your team
   backstory: >
     You work at crewAI (https://crewai.com) and are now working on
-    providing customer support to {customer}, a super important
+    providing customer support to {name}, a super important
     customer for your company. You need to make sure that you provide
     the best support! Make sure to provide full complete answers,
     and make no assumptions.
@@ -19,7 +19,7 @@ quality_assurance_agent:
     in your team
   backstory: >
     You work at crewAI (https://crewai.com) and are now working with
-    your team on a request from {customer} ensuring that the support
+    your team on a request from {name} ensuring that the support
     representative is providing the best support possible. You need
     to make sure that the support representative is providing full
     complete answers, and make no assumptions.
