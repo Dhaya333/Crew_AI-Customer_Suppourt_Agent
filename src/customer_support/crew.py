@@ -2,7 +2,9 @@ import os
 
 from crewai import Agent, Crew, Process, Task, LLM
 from crewai.project import CrewBase, agent, task, crew
-from customer_support.tools.custom_tools import docs_scrape_tool
+
+from customer_support.tools.custom_tools import docs_scrape_tools, search_tool
+
 
 @CrewBase
 class CustomerSupportCrew:
@@ -25,7 +27,7 @@ class CustomerSupportCrew:
         return Agent(
             config=self.agents_config["customer_support_agent"],
             llm=self.llm,
-            tools=[docs_scrape_tool],
+            tools=[*docs_scrape_tools, search_tool],
             allow_delegation=False,
             verbose=True,
         )
@@ -61,3 +63,4 @@ class CustomerSupportCrew:
             memory=False,
             verbose=os.getenv("CREW_VERBOSE", "true").lower() == "true",
         )
+    
