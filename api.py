@@ -26,8 +26,8 @@ app = FastAPI(title="Customer Support Agent API")
 
 
 class SupportRequest(BaseModel):
-    customer: str
-    person: str
+    name: str
+    category: str
     inquiry: str
     reply_to_email: str = ""      # if set, emails the result too
 
@@ -37,8 +37,8 @@ class SupportResponse(BaseModel):
     emailed: bool
 
 
-def _run_crew_and_email(customer: str, person: str, inquiry: str, reply_to_email: str) -> SupportResponse:
-    inputs = {"customer": customer, "person": person, "inquiry": inquiry}
+def _run_crew_and_email(category: str, name: str, inquiry: str, reply_to_email: str) -> SupportResponse:
+    inputs = {"category": category, "name": name, "inquiry": inquiry}
 
     try:
         result = CustomerSupportCrew().crew().kickoff(inputs=inputs)
@@ -52,7 +52,7 @@ def _run_crew_and_email(customer: str, person: str, inquiry: str, reply_to_email
         try:
             send_email(
                 to_email=reply_to_email,
-                subject=f"Re: Your inquiry to {customer} support",
+                subject=f"Hi {name}, Response to your inquiry about '{category}'",
                 body=result_text,
             )
             emailed = True
@@ -67,7 +67,7 @@ def _run_crew_and_email(customer: str, person: str, inquiry: str, reply_to_email
 @app.post("/support-request", response_model=SupportResponse)
 def handle_support_request(payload: SupportRequest):
     return _run_crew_and_email(
-        payload.customer, payload.person, payload.inquiry, payload.reply_to_email
+        payload.category, payload.name, payload.inquiry, payload.reply_to_email
     )
 
 
@@ -82,8 +82,8 @@ def process_latest_form_response():
         raise HTTPException(status_code=500, detail=f"Could not read form response: {e}")
 
     return _run_crew_and_email(
-        form_inputs["customer"],
-        form_inputs["person"],
+        form_inputs["category"],
+        form_inputs["name"],
         form_inputs["inquiry"],
         form_inputs["reply_to_email"],
     )
