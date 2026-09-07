@@ -13,8 +13,8 @@ from customer_support.crew import CustomerSupportCrew
 def run():
     """Kick off the customer support crew with a sample inquiry."""
     inputs = {
-        "customer": "soniya sharma",
-        "person": "Gobiiii",
+        "name": "soniya sharma",
+        "category": "report a bug",
         "inquiry": (
             "I need help with setting up a Crew and kicking it off, "
             "specifically how can I add memory to my crew? "
