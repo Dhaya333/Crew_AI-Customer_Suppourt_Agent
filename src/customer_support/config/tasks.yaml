@@ -7,6 +7,11 @@ inquiry_resolution:
     to use everything you know to provide the best support possible.
     You must strive to provide a complete and accurate response to
     the customer's inquiry.
+
+    Use the scraping tools available to you to check the relevant
+    documentation pages. If those pages don't fully answer the
+    question, use the search tool to find additional relevant
+    information online.
   expected_output: >
     A detailed, informative response to the customer's inquiry that
     addresses all aspects of their question. The response should
