@@ -14,21 +14,24 @@ import requests
 API_BASE = "http://localhost:8000"
 
 st.set_page_config(page_title="Customer Support Agent", page_icon="🎧")
-st.title("🎧 Customer Support Agent")
-st.caption("Powered by CrewAI + Gemini")
+st.title("Customer Support Agent (Mail)")
+st.caption("Developed by Udhaya A")
 
-tab_manual, tab_form = st.tabs(["Ask manually", "Process latest Google Form response"])
+tab_manual, tab_form = st.tabs(["Ask manually", "Process pending Google Form responses"])
 
 with tab_manual:
     with st.form("support_form"):
-        category = st.text_input("Category", placeholder="e.g., Report a bug")
+        category = st.selectbox(
+            "Category",
+            ["Need support in code", "Feedback", "Report a Bug", "Installation"],
+        )
         name = st.text_input("Your name", placeholder="Jane Doe")
         inquiry = st.text_area("What do you need help with?", height=150)
         submitted = st.form_submit_button("Submit")
 
     if submitted:
-        if not category or not name or not inquiry:
-            st.error("Please fill in Category, Your name, and the Inquiry field.")
+        if not name or not inquiry:
+            st.error("Please fill in your name and the inquiry field.")
         else:
             with st.spinner("Agents are working on your request..."):
                 try:
@@ -53,14 +56,15 @@ with tab_manual:
 
 with tab_form:
     st.write(
-        "Pulls the newest submission from your linked Google Sheet and "
-        "emails the answer straight back to the email address given in "
-        "that response — no manual entry needed."
+        "Processes every not-yet-sent submission in your linked Google "
+        "Sheet, one after another with a short delay between each, and "
+        "emails each answer to the address given in that response. Rows "
+        "already marked 'sent' are skipped."
     )
-    if st.button("Process latest form response"):
-        with st.spinner("Reading the latest form response and running the agents..."):
+    if st.button("Process pending form responses"):
+        with st.spinner("Reading pending form responses and running the agents..."):
             try:
-                resp = requests.post(f"{API_BASE}/process-latest-form-response", timeout=300)
+                resp = requests.post(f"{API_BASE}/process-pending-form-responses", timeout=600)
                 resp.raise_for_status()
                 data = resp.json()
             except requests.exceptions.ConnectionError:
@@ -71,14 +75,10 @@ with tab_form:
             except Exception as e:
                 st.error(f"Something went wrong: {e}")
             else:
-                st.success("Done!")
-                st.markdown("### Response")
-                st.write(data["response"])
-                if data["emailed"]:
-                    st.info("Emailed to the address from the form response.")
+                if data["processed"] == 0:
+                    st.info("No pending responses — everything is already marked 'sent'.")
                 else:
-                    st.warning(
-                        "Response generated, but the email send failed — "
-                        "check your Gmail app password setup and the form's "
-                        "email column."
-                    )
+                    st.success(f"Processed {data['processed']} response(s).")
+                    for item in data["results"]:
+                        status = "✅ Emailed" if item["emailed"] else "⚠️ Email failed"
+                        st.write(f"**{item['name']}** — {item['category']} — {status}")
