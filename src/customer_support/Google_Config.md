@@ -41,7 +41,7 @@ Adjust `COLUMN_MAP` to match the actual question titles in your form.
 
 > **Important:** The column names are generated automatically from the form's question titles and are **case-sensitive**. Ensure the spelling is exact and do not include additional spaces.
 
-| Timestamp (Auto-generated) | Name | Category | Inquiry | Registered Email_ID |
+| Timestamp (Auto-generated) | Name | Category | Inquiry | Registered Email_ID | Mail_status
 |---|---|---|---|---|
 
 ---
