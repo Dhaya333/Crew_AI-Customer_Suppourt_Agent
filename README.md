@@ -90,6 +90,8 @@ customer_support_agent/
 
 Everything below is run from the project root, with the venv active.
 
+**Refer the Testing.md file for each functions Manual check and setup**
+
 **1. Sanity-check the crew works at all** (no Sheets/API needed):
 ```powershell
 python main.py
