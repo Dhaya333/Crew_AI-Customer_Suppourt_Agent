@@ -9,6 +9,7 @@ Then POST to http://localhost:8000/support-request
 
 import sys
 import os
+import time
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -20,14 +21,19 @@ from pydantic import BaseModel
 
 from customer_support.crew import CustomerSupportCrew
 from customer_support.email_utils import send_email
-from customer_support.google_form_reader import get_latest_form_response
+from customer_support.google_form_reader import (
+    get_pending_form_responses,
+    mark_response_as_sent,
+)
 
 app = FastAPI(title="Customer Support Agent API")
 
+DELAY_BETWEEN_RESPONSES_SECONDS = 5
+
 
 class SupportRequest(BaseModel):
-    name: str
     category: str
+    name: str
     inquiry: str
     reply_to_email: str = ""      # if set, emails the result too
 
@@ -35,6 +41,17 @@ class SupportRequest(BaseModel):
 class SupportResponse(BaseModel):
     response: str
     emailed: bool
+
+
+class PendingResult(BaseModel):
+    name: str
+    category: str
+    emailed: bool
+
+
+class PendingBatchResponse(BaseModel):
+    processed: int
+    results: list[PendingResult]
 
 
 def _run_crew_and_email(category: str, name: str, inquiry: str, reply_to_email: str) -> SupportResponse:
@@ -52,7 +69,7 @@ def _run_crew_and_email(category: str, name: str, inquiry: str, reply_to_email: 
         try:
             send_email(
                 to_email=reply_to_email,
-                subject=f"Hi {name}, Response to your inquiry about '{category}'",
+                subject=f"Your {category} request",
                 body=result_text,
             )
             emailed = True
@@ -71,22 +88,39 @@ def handle_support_request(payload: SupportRequest):
     )
 
 
-@app.post("/process-latest-form-response", response_model=SupportResponse)
-def process_latest_form_response():
-    """Pulls the newest Google Form submission from the linked Sheet and
-    automatically emails the result to the address given in that same
-    response — no manual email entry needed anywhere."""
+@app.post("/process-pending-form-responses", response_model=PendingBatchResponse)
+def process_pending_form_responses():
+    """Pulls every not-yet-sent Google Form submission from the linked
+    Sheet, runs the crew and emails each one in turn (5s delay between
+    each), and marks each row's Mail_status as 'sent' once its email
+    goes out."""
     try:
-        form_inputs = get_latest_form_response()
+        pending = get_pending_form_responses()
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Could not read form response: {e}")
+        raise HTTPException(status_code=500, detail=f"Could not read form responses: {e}")
 
-    return _run_crew_and_email(
-        form_inputs["category"],
-        form_inputs["name"],
-        form_inputs["inquiry"],
-        form_inputs["reply_to_email"],
-    )
+    results = []
+    for i, item in enumerate(pending):
+        support_response = _run_crew_and_email(
+            item["category"], item["name"], item["inquiry"], item["reply_to_email"]
+        )
+
+        if support_response.emailed:
+            try:
+                mark_response_as_sent(item["_row_number"])
+            except Exception as e:
+                # Email went out but we couldn't update the sheet — log it,
+                # don't crash the whole batch over a status-write failure.
+                print(f"Could not update Mail_status for row {item['_row_number']}: {e}")
+
+        results.append(
+            PendingResult(name=item["name"], category=item["category"], emailed=support_response.emailed)
+        )
+
+        if i < len(pending) - 1:
+            time.sleep(DELAY_BETWEEN_RESPONSES_SECONDS)
+
+    return PendingBatchResponse(processed=len(results), results=results)
 
 
 @app.get("/health")
